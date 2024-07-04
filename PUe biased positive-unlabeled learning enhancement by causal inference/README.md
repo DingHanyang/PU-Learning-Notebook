@@ -67,3 +67,37 @@ $$
 $$
 \hat{R}_uPU(g) = \pi \hat{R}_P(g,+1)+\hat{R}_U(g,+1)-\pi \hat{R}_P(g,-1)
 $$
+
+
+
+
+
+**公式（12）的推导**
+
+偏差定义为理想损失函数与实际损失函数之间的差异：
+$$ bias(\hat{R}_{PUe}(g)) = R_{PUe}(g) - \hat{R}_{PUe}(g) $$
+
+代入上面的公式，有：
+$$ bias(\hat{R}_{PUe}(g)) = \left( \pi R_P(g, +1) + R_U(g, -1) - \pi R_P(g, -1) \right) - \left( \pi \hat{R}_{P\tilde{e}}(g, +1) + \hat{R}_U(g, -1) - \pi \hat{R}_{P\tilde{e}}(g, -1) \right) $$
+
+由于 $R_U(g, -1)$ 和 $\hat{R}_U(g, -1)$ 在这里相等，它们抵消掉：
+$R_U$不受倾向性得分的影响
+
+$$ bias(\hat{R}_{PUe}(g)) = \pi \left( R_P(g, +1) - \hat{R}_{P\tilde{e}}(g, +1) \right) - \pi \left( R_P(g, -1) - \hat{R}_{P\tilde{e}}(g, -1) \right) $$
+
+考虑到正类样本的损失期望，可以将其表达为求和形式：
+
+$$ R_P(g, +1) = \frac{1}{N_P} \sum_{i=1}^{n_P} L(g(x_i^P), +1) $$
+$$ \hat{R}_{P\tilde{e}}(g, +1) = \frac{1}{N_P} \sum_{i=1}^{n_P} \frac{\tilde{e}(x_i)}{\tilde{e}(x_i)} L(g(x_i^P), +1) $$
+
+其中，$\hat{R}_{P\tilde{e}}(g, +1)$ 可以表示为 $\frac{\tilde{e}(x_i)}{\tilde{e}(x_i)} = 1$，所以我们考虑估计误差的部分。
+
+同样地，对于负类样本：
+
+$$ R_P(g, -1) = \frac{1}{N_P} \sum_{i=1}^{n_P} L(g(x_i^P), -1) $$
+$$ \hat{R}_{P\tilde{e}}(g, -1) = \frac{1}{N_P} \sum_{i=1}^{n_P} \frac{\tilde{e}(x_i)}{\tilde{e}(x_i)} L(g(x_i^P), -1) $$
+
+我们最终将这些差异项合并，得到：
+
+$$ bias(\hat{R}_{PUe}(g)) = \pi \sum_{i=1}^{n} y_i \left\{ \left( \frac{1}{N_P} - \frac{\tilde{e}(x_i)}{N_P \tilde{e}(x_i)} \right) * [L(g(x_i), +1) - L(g(x_i), -1)] \right\} $$
+
