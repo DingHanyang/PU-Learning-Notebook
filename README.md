@@ -14,6 +14,9 @@
 
 [仓库地址](https://github.com/MasaKat0/PUlearning/tree/master)
 
+1. selection bias 策略问题dataset_linear.py里面是不是人工的标注选择偏差
+2. 要把评分标准统一
+
 使用的数据集：
 
 - UCI(mushrooms、shuttle、pageblocks、usps、connect-4、spambase)
