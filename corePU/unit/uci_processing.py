@@ -1,7 +1,9 @@
 """
 This module provides functions for processing UCI data
 """
+import ssl
 from ucimlrepo import fetch_ucirepo
+ssl._create_default_https_context = ssl._create_unverified_context
 
 # fetch dataset
 breast_cancer_wisconsin_diagnostic = fetch_ucirepo(id=17)
