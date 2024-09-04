@@ -15,8 +15,8 @@ EM的步长 20-->100
 class MLP(nn.Module):
     def __init__(self, dim_feature):
         super().__init__()
-        self.fc1 = nn.Linear(dim_feature, int(10))
-        self.fc2 = nn.Linear(int(10), 1)
+        self.fc1 = nn.Linear(dim_feature, int(100))
+        self.fc2 = nn.Linear(int(100), 1)
 
     def forward(self, inputs):
         x = self.fc1(inputs)
@@ -68,13 +68,14 @@ def em_train(x_train, q_train, x_test, y_test, lr, wd):
     ], lr=lr, weight_decay=wd)
 
     N = x_train.size(0)
-    for e_step in range(100):
+    for e_step in range(20):
+        print(f'step:{e_step}')
 
         P_yi1_xi = model_pyx(x_train).sigmoid().squeeze()
         eta = model_eta(x_train).sigmoid().squeeze()
         pst = EStep(P_yi1_xi, eta, q_train).detach()
 
-        for m_step in range(100):
+        for m_step in range(20):
             indies = t.randperm(N)[:int(N / 10)]
             optimizer.zero_grad()
 
@@ -112,7 +113,7 @@ if __name__ == "__main__":
 
     # fea, tar, tar_pu, _ = syn(type=int(sys.argv[1]), noise_rate=float(sys.argv[2]), reader = reader_australian, Power=2)
 
-    fea, tar, tar_pu, _ = syn(type=1, noise_rate=0.1, reader=reader_breast, Power=2)
+    fea, tar, tar_pu, _ = syn(type=2, noise_rate=0.2, reader=reader_australian, Power=2)
 
     fea_norm = (fea - fea.mean(0, keepdim=True)) / fea.std(0, keepdim=True)
     print('p %.2f n %.2f' % (tar_pu[tar == 1].mean(), (1 - tar_pu)[tar == 0].mean()))

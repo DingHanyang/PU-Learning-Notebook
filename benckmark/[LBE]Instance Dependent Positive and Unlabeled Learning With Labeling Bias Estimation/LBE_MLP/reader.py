@@ -5,12 +5,84 @@ import torch.optim as optim
 import sys
 import numpy as np
 
+import os
+import ssl
+import torch
+import pandas as pd
+import urllib.request
+from ucimlrepo import fetch_ucirepo
+
+os.environ['http_proxy'] = '127.0.0.1:1066'
+os.environ['https_proxy'] = '127.0.0.1:1066'
+
+ssl._create_default_https_context = ssl._create_unverified_context
+
+
+def _preprocess_data(uci_id):
+    # fetch dataset
+    dataset = fetch_ucirepo(id=uci_id)
+
+    # data (as pandas dataframes)
+    X = dataset.data.features
+    y = dataset.data.targets
+
+    # 检测并删除缺失值
+    combined = pd.concat([X, y], axis=1)
+    combined_cleaned = combined.dropna()
+
+    # 分离 features 和 targets
+    X_cleaned = combined_cleaned.iloc[:, :-1]
+    y_cleaned = combined_cleaned.iloc[:, -1]
+
+    # 转换为 PyTorch 张量
+    features = torch.Tensor(X_cleaned.to_numpy())
+    targets = torch.Tensor(y_cleaned.to_numpy()).flatten()
+
+    return features, targets
+
+
+def get_uci_dataset_by_id(uci_id):
+
+    match int(uci_id):
+        case 15:
+            # Breast
+            features, targets = _preprocess_data(uci_id)
+            # 转换标签为二分类
+            targets = torch.where(targets != 4, torch.tensor(0.), torch.tensor(1.)) # 4为恶性 2为良性 改为1,0
+            print(f'{features.shape}, p:{torch.sum(targets).item()}, n:{torch.sum(targets != 1).item()}')
+            return features, targets
+        case 143:
+            # Australian
+            features, targets = _preprocess_data(uci_id)
+            # 转换标签为二分类
+            targets = torch.where(targets != 1, torch.tensor(0.), torch.tensor(1.)) # 1 为正类 2为负 改为1,0
+            print(f'{features.shape}, p:{torch.sum(targets).item()}, n:{torch.sum(targets != 1).item()}')
+            return features, targets
+        case 267:
+            # banknote
+            features, targets = _preprocess_data(uci_id)
+            # 转换标签为二分类
+            targets = torch.where(targets != 1, torch.tensor(0.), torch.tensor(1.)) # 1 为正类 2为负 改为1,0
+            print(f'{features.shape}, p:{torch.sum(targets).item()}, n:{torch.sum(targets != 1).item()}')
+            return features, targets
+        case 327:
+            # Phishing
+            features, targets = _preprocess_data(uci_id)
+            # 转换标签为二分类
+            targets = torch.where(targets != 1, torch.tensor(0.), torch.tensor(1.)) # 1 为正类 2为负 改为1,0
+            print(f'{features.shape}, p:{torch.sum(targets).item()}, n:{torch.sum(targets != 1).item()}')
+            return features, targets
+
+
+
 
 def reader_breast():
     data = scio.loadmat('datasets/breast.mat')['breast'].toarray()
     features, targets = t.Tensor(data[:, :-1]), t.Tensor(data[:, -1])
     targets = t.where(targets != 1, t.zeros_like(targets), targets)
-    return features, targets
+
+
+    return get_uci_dataset_by_id(15)
 
 
 def reader_australian():
@@ -18,7 +90,7 @@ def reader_australian():
     features, targets = data['fea'], data['gnd']
     features, targets = t.Tensor(features.toarray()), t.Tensor(targets).squeeze()
     targets = t.where(targets != 1, t.zeros_like(targets), targets)
-    return features, targets
+    return get_uci_dataset_by_id(267)
 
 
 def syn(type, noise_rate, reader, ShrinkCoef=1, Power=1000):
@@ -66,7 +138,7 @@ def mySampling(py, n, targets, diu):
         py = 0.9 * py + 0.1 * p_uni
     idx = t.Tensor(range(targets.size(0))).to(targets.device)[targets == 1].long()
     pu_targets = t.zeros_like(targets)
-    #print(py)
+    # print(py)
     while pu_targets.sum() < n:
         tmp = np.random.choice(py.size(0), 1, True, py.numpy())
         pu_targets[idx[tmp]] = 1
