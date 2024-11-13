@@ -1,5 +1,17 @@
 # UCI二分类数据集整理
 
+
+
+- breast
+- banknote
+- mushrooms
+- Adult
+- 20 Newsgroups
+
+
+
+
+
 ## 整理的文章中所使用的二分类数据集
 
 - Instance-Dependent Positive and Unlabeled Learning With Labeling Bias Estimatio(LBE-LF)

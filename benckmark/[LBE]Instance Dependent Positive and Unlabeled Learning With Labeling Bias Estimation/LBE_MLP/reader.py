@@ -72,6 +72,31 @@ def get_uci_dataset_by_id(uci_id):
             targets = torch.where(targets != 1, torch.tensor(0.), torch.tensor(1.)) # 1 为正类 2为负 改为1,0
             print(f'{features.shape}, p:{torch.sum(targets).item()}, n:{torch.sum(targets != 1).item()}')
             return features, targets
+        case 73:
+            # fetch dataset
+            dataset = fetch_ucirepo(id=uci_id)
+
+            # data (as pandas dataframes)
+            X = dataset.data.features
+            y = dataset.data.targets
+            # 检测并删除缺失值
+            combined = pd.concat([X, y], axis=1)
+            combined_cleaned = combined.dropna()
+
+            # 分离 features 和 targets
+            X_cleaned = combined_cleaned.iloc[:, :-1]
+            y_cleaned = combined_cleaned.iloc[:, -1]
+
+            X_vectorized = pd.get_dummies(X_cleaned)
+
+            # 如果 y 是分类变量，也需要转换
+            # 比如如果 y 也是 'p' 和 'e' 两种类别
+            y_vectorized = pd.get_dummies(y_cleaned)
+
+            # 转换为 PyTorch 张量
+            features = torch.Tensor(X_vectorized.to_numpy())
+            targets = torch.Tensor(y_vectorized.to_numpy())[:,1]
+            return features, targets
 
 
 
@@ -90,7 +115,7 @@ def reader_australian():
     features, targets = data['fea'], data['gnd']
     features, targets = t.Tensor(features.toarray()), t.Tensor(targets).squeeze()
     targets = t.where(targets != 1, t.zeros_like(targets), targets)
-    return get_uci_dataset_by_id(267)
+    return get_uci_dataset_by_id(73)
 
 
 def syn(type, noise_rate, reader, ShrinkCoef=1, Power=1000):

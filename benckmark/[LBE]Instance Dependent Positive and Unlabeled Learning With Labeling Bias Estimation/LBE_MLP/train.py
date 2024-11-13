@@ -15,8 +15,8 @@ EM的步长 20-->100
 class MLP(nn.Module):
     def __init__(self, dim_feature):
         super().__init__()
-        self.fc1 = nn.Linear(dim_feature, int(100))
-        self.fc2 = nn.Linear(int(100), 1)
+        self.fc1 = nn.Linear(dim_feature, int(150))
+        self.fc2 = nn.Linear(int(150), 1)
 
     def forward(self, inputs):
         x = self.fc1(inputs)
